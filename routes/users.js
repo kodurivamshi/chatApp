@@ -12,7 +12,7 @@ var mail;
 const { ensureAuthenticated , forwardAuthenticated } = require('../config/auth');
 
 // Welcome Page
-router.get('/', forwardAuthenticated, (req, res) => res.render('welcome'));
+router.get('/', (req, res) => res.render('welcome'));
 
 // Login Page
 router.get('/login.html', forwardAuthenticated, (req, res) => res.render('login'));
