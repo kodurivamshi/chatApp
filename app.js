@@ -41,15 +41,11 @@ mongoose
 
 // EJS
 //app.use(expressLayouts);
+app.set(express.urlencoded({extended:true}));
 app.engine('html',require('ejs').renderFile);
 app.set('view engine','html');
 
 
-// Express body parser
-app.use(express.json());
-app.use(bodyparser.urlencoded({extended:true}));
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieparser());
 
 // Express session
 app.use(
@@ -144,6 +140,6 @@ io.on('connection',(clientsocket)=>{
 
 const PORT = process.env.PORT;
 
-server.listen(PORT, console.log(`Server started on port ${PORT}`));
+app.listen(PORT, console.log(`Server started on port ${PORT}`));
 
 
