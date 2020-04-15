@@ -10,7 +10,7 @@ const cors=require("cors");
 const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
-const socket=require("socket.io");
+//const socket=require("socket.io");
 const msgformat=require('./utils/msgformat');
 const {joinuser, getuser, leaveuser, roomusers}=require('./utils/users');
 
@@ -42,6 +42,10 @@ mongoose
 
 // EJS
 //app.use(expressLayouts);
+app.use(bodyparser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyparser.json())
 app.set(express.urlencoded({extended:true}));
 app.engine('html',require('ejs').renderFile);
 app.set('view engine','html');
@@ -76,10 +80,11 @@ app.use(function(req, res, next) {
 // Routes
 app.use('/', require('./routes/users'));
 
-const server=http.createServer(app);
 
-//socket connection...
-const io=socket(server);
+const PORT = process.env.PORT;
+
+var server=app.listen(PORT, console.log(`Server started on port ${PORT}`));
+var io      = require('socket.io').listen(server);
 
 
 
@@ -124,20 +129,4 @@ io.on('connection',(clientsocket)=>{
         io.to(user.room).emit('roomusers',{room: user.room,  users:roomusers(user.room)});
     })
   
-  })
-
-
-
-
-
-
-
-
-
-
-
-const PORT = process.env.PORT;
-
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
-
-
+  });
