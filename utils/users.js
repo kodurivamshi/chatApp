@@ -10,6 +10,11 @@ function getuser(id){
     return a.find(user=>id==user.id);
 }
 
+function getid(name){
+    console.log(name);
+    return a.find(user=>name==user.username);
+}
+
 function leaveuser(id){
     var index=a.findIndex(user=>id==user.id);
     if(index!=-1){
@@ -26,5 +31,6 @@ module.exports={
     joinuser,
     getuser,
     leaveuser,
-    roomusers
+    roomusers,
+    getid
 }

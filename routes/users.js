@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const http=require("http");
-
+var Qs=require('querystring');
 
 // Load User model
 const User = require('../models/User');
@@ -84,10 +84,21 @@ router.post('/register.html', (req, res) => {
   }
 });
 
+
+const roomschema=require("../models/room");
+//const roomchat=require("../models/roomchat");
+//const clientchat=require("../models/chat");
+
 // Login
 router.post('/login.html', (req, res, next) => {
   mail=req.body.email;
   console.log(mail);
+  var room1;
+  roomschema.find({},(err,room)=>{
+    //console.log(room);
+    room1=room;
+  })
+  console.log("logined..");
   passport.authenticate('local', {
     successRedirect: '/room.html',
     failureRedirect: '/login.html',
@@ -96,7 +107,7 @@ router.post('/login.html', (req, res, next) => {
 });
 
 // Logout
-router.get('/logout', (req, res) => {
+router.get('/logout',(req, res) => {
   req.logout();
   req.flash('success_msg', 'You are logged out');
   res.redirect('/login.html');
@@ -104,17 +115,54 @@ router.get('/logout', (req, res) => {
 
 //room and chat page
 router.get('/chat.html',ensureAuthenticated,(req,res,next)=>{
+  room=req.query.room;
+  username=req.query.username;
+  
   res.render('chat');
 })
 router.get('/chat.html',(req,res,next)=>{
+  room=req.query.room;
+  username=req.query.username;
   res.render('chat');
 })
 router.get('/room.html',ensureAuthenticated,(req,res,next)=>{
-  res.render('room');
+  roomschema.find({},(err,room)=>{
+    console.log(room,"rooms1");
+    room1=room;
+  res.render('room',{room});
 })
+})
+
 router.get('/room.html',(req,res,next)=>{
-  res.render('room');
+  roomschema.find({},(err,room)=>{
+    //console.log(room);
+    console.log(room,"rooms2");
+    room1=room;
+  res.render('room',{room});
 })
+})
+router.post("/room",(req,res)=>{
+  const room={
+      roomName:req.body.roomName
+  }
+  roomschema(room).save()
+  .then(()=>{
+      roomschema.find({},(err,room)=>{
+     console.log(room,"rooms3 stored in db");
+      room1=room;
+  res.render("room",{room});
+  });
+})
+  .catch(eer=>console.log(eer));
+})
+// router.get("/room",(req,res)=>{
+//   roomschema.find({},(err,room)=>{
+//       //console.log(room);
+//       room1=room;
+//   res.render("room",{room});
+//   })
+// });
+
 
 //mongoDB operations...
 

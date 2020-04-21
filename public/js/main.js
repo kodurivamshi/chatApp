@@ -1,17 +1,30 @@
 const sock=io();
-console.log("dd");
+
 var chat=document.querySelector('.chat-messages');
 var form=document.getElementById('chat-form');
 var roomname=document.getElementById('room-name');
 var roomusers=document.getElementById('users');
 
+var chat=[];
+var personalchat;
+
 form.addEventListener('submit',(event)=>{
     event.preventDefault();
-
+    var txt1=event.target.elements.to.value;
     var txt=event.target.elements.msg.value;
+    if(txt1==''){
     sock.emit('chatmessage',txt);//sending to server...from one particular client..
     event.target.elements.msg.value='';
     event.target.elements.msg.focus();
+    }
+    else{
+        const msg={
+            to:txt1,
+            message:txt
+        }
+        sock.emit('personalmsg',msg);//personal msg within the group...
+        event.target.elements.to.value='';
+    }
 }) 
 
 //get the current client username and room...
@@ -26,28 +39,318 @@ sock.on('roomusers',({room, users})=>{
     roomname.innerHTML=room;
     
     roomusers.innerHTML='';
+
+
     users.forEach(user=>{
-        roomusers.innerHTML+=`<li>${user.username}</li>`;
-    })
+        if(sock.id!=user.id){
+        // roomusers.innerHTML+=`<li><a href='/personal/(?id1=${sock.id}&id2=${user.id}'>${user.username})</a></li>`;
+        var anc=document.createElement('a');
+        anc.innerHTML=user.username;
+        anc.setAttribute("href","#");
+        anc.setAttribute("class","u");
+        anc.style.background=" #e6e9ff";
+        anc.addEventListener("click",(event)=>{
+            var users=event.target.innerHTML;
+            sock.emit("previouspersonalchat",{to:users,from:sock.id});
+            //var chat=[];
+
+            sock.on("previouspersonalchat",(msg)=>{
+                //console.log(msg);
+                personalchat=msg
+                if(personalchat.length>0){
+                    personalchat.forEach(user=>{
+                        console.log(user);
+                        if(user.sender!="You "){
+                            var div=pop.document.createElement("div");
+                            var para=pop.document.createElement("p");
+                            para.innerHTML=`${user.sender}&nbsp${user.time}<br>${user.msg}<br>`;
+                            div.style.backgroundColor="#667aff"
+                            div.style.color=" #e6e9ff"
+                            div.style.borderRadius="10px"
+                            div.style.textAlign="left";
+                            div.append(para);
+                            main.append(div);
+                            //pop.document.body.appendChild(main);
+            
+                        }else{
+                            var div=pop.document.createElement("div");
+                            var para=pop.document.createElement("p");
+                            para.innerHTML=`You ${user.time}&nbsp<br>${user.msg}<br>`;
+                            div.style.border="2px sollid white";
+                            div.style.backgroundColor="black";
+                            div.style.color="white";
+                            div.style.borderRadius="10px"
+                            div.style.textAlign="right";
+                            div.append(para);
+                            main.append(div);
+                            //pop.document.body.appendChild(main);
+                        }
+                    })
+                } 
+                
+
+            })
+
+            
+            var pop=open("","Popup","width=400,height=500");
+            //header..div
+            var head=pop.document.createElement("div");
+            var p=pop.document.createElement("p");
+            p.innerHTML=users;
+            head.style.backgroundColor="black";
+            head.style.color="white";
+            head.style.textAlign="center";
+            head.append(p)
+            pop.document.body.appendChild(head);
+            
+            var main=pop.document.createElement("div");
+            //main.setAttribute("class","chat-messages");
+            main.style.height="400";
+           
+            main.style.overflowY="auto";
+            pop.document.body.appendChild(main);
+            main.scrollTop=main.scrollHeight;
+
+            
+           var foot=pop.document.createElement("div");
+           foot.style.background="#5cb85c";
+           foot.style.height="50px";
+            pop.document.body.appendChild(foot);
+
+            var text=pop.document.createElement("input");
+                text.setAttribute("type","text");
+                text.setAttribute("class","txt");
+                text.style.width="300";
+                text.style.marginTop="15px";
+                text.style.marginLeft="10px";
+                foot.append(text);
+            var but=pop.document.createElement("button");
+                but.innerHTML="send";
+                but.style.marginTop="15px";
+                //but.setAttribute("class","btn1");
+                foot.append(but);
+
+                //console.log(personalchat);
+                
+                var para=pop.document.createElement("p");
+                //console.log("outgoing:-",personalchatout);
+            //     if(personalchatout.length>0){
+            //             personalchatout.forEach(user=>{
+            //                 if(users==user.uName){
+            //                     //para.innerHTML+=`<h4>You</h4>${user.time}<br>${user.txt}<br><br>`;
+            //                     user.me="You";
+            //                     chat.push(user);
+            //                     // var ind=personalchatout.indexOf(user);
+            //                     // personalchatout.splice(ind,1);
+            //                 }
+            //             })
+            //     }//console.log("incoming:-",personalchatin);
+            //     if(personalchatin.length>0){
+            //         personalchatin.forEach(user=>{
+            //             if(users==user.uName){
+            //                 //para.innerHTML+=`<h4>${users}<h4>${user.time}<br>${user.txt}<br><br>`;
+            //                 user.me="not me";
+            //                 chat.push(user);
+            //                 // var ind=personalchatin.indexOf(user);
+            //                 // personalchatin.splice(ind,1);
+            //             }
+            //         })
+            //     }
+            //    //pop.document.body.appendChild(div.appendChild(para));
+            //    console.log(chat);
+            //    chat.sort((a,b)=>{
+            //     timeStr1 = a.time ;
+            //     timeStr2 = b.time;
+            //     //console.log(a.time,b.time,timeStr1,timeStr2);
+            //     return (parseInt(timeStr2.replace(':', ''), 10) > parseInt(timeStr1.replace(':', ''), 10)) ? -1 : 1;  
+            //    });
+            //    console.log("sorted chat:-",chat);
+               var flag=0;
+               if(chat.length>0){
+                    chat.forEach(user=>{
+                        if(users==user.uName){
+                        if(user.dir=="not me"){
+                            var div=pop.document.createElement("div");
+                            var para=pop.document.createElement("p");
+                            para.innerHTML=`${user.uName}&nbsp${user.time}<br>${user.txt}<br>`;
+                            div.style.backgroundColor="#667aff"
+                            div.style.color=" #e6e9ff"
+                            div.style.borderRadius="10px"
+                            div.style.textAlign="left";
+                            div.append(para);
+                            main.append(div);
+                            //pop.document.body.appendChild(main);
+            
+                        }else{
+                            var div=pop.document.createElement("div");
+                            var para=pop.document.createElement("p");
+                            para.innerHTML=`You ${user.time}&nbsp<br>${user.txt}<br>`;
+                            div.style.border="2px sollid white";
+                            div.style.backgroundColor="black";
+                            div.style.color="white";
+                            div.style.borderRadius="10px"
+                            div.style.textAlign="right";
+                            div.append(para);
+                            main.append(div);
+                            //pop.document.body.appendChild(main);
+                        }
+                    }
+                    })
+                }
+                else{
+                    flag=1;
+                    // var text=pop.document.createElement("input");
+                    // text.setAttribute("type","text");
+                    // text.setAttribute("class","txt");
+                    // foot.append(text);
+                   // pop.document.body.appendChild(foot);
+        
+                    // var but=pop.document.createElement("button");
+                    // but.innerHTML="send";
+                    but.addEventListener('click',(event)=>{
+                        var txt=pop.document.querySelector(".txt").value;
+                        const msg={
+                            to:users,
+                            from:sock.id,
+                            message:txt
+                        }
+                        
+                        var div=pop.document.createElement("div");
+                        var para=pop.document.createElement("p");
+                        para.innerHTML=`<h4>"You&nbsp"<h4><br>${msg.message}<br>`;
+                        div.style.border="2px sollid white";
+                        div.style.backgroundColor="black";
+                        div.style.color="white";
+                        div.style.borderRadius="10px"
+                        div.style.textAlign="right";
+                        div.append(para);
+                        main.append(div);
+                     //   pop.document.body.appendChild(main);
+        
+                        sock.emit("panelmsg",msg);
+                       
+                    })
+                    foot.append(but);
+                    //pop.document.body.appendChild(foot);
+                }
+                if(flag==0){
+                // var text=pop.document.createElement("input");
+                // text.setAttribute("type","text");
+                // text.setAttribute("class","txt");
+                // foot.append(text);
+              //  pop.document.body.appendChild(foot);
+    
+               
+    
+                // var but=pop.document.createElement("button");
+                // but.innerHTML="send";
+                but.addEventListener('click',(event)=>{
+                    var txt=pop.document.querySelector(".txt").value;
+                    const msg={
+                        to:users,
+                        from:sock.id,
+                        message:txt
+                    }
+                    console.log(msg);
+                    var div=pop.document.createElement("div");
+                    var para=pop.document.createElement("p");
+                    para.innerHTML=`<h4>"You&nbsp"<h4><br>${msg.message}<br>`;
+                    div.style.border="2px sollid white";
+                    div.style.backgroundColor="black";
+                    div.style.color="white";
+                    div.style.textAlign="right";
+                    div.append(para);
+                    main.append(div);
+                //    pop.document.body.appendChild(main);
+                    sock.emit("panelmsg",msg);
+                   
+                })
+                // foot.append(but);
+                //pop.document.body.appendChild(foot);
+            }
+            
+            });
+        var li=document.createElement("li");
+        li.appendChild(anc);
+        roomusers.appendChild(li);
+     } })
+
 });
 
+sock.on('panelpersonalmsgin',(msg)=>{
+    //personalchatin.push(msg);
+    //console.log(msg);
+    msg.dir="not me";
+    chat.push(msg);
+})
+
+sock.on('panelpersonalmsgout',(msg)=>{
+    //personalchatout.push(msg);
+    //console.log(msg);
+    msg.dir="me";
+    chat.push(msg);
+})
+
+//roommessages printing from database...
+sock.on('room',(msg)=>{
+    
+    console.log(msg.chat,msg.clientname);
+    msg.chat.forEach(chat=>{
+    var div=document.createElement('div');
+    div.classList.add('message');
+    if(chat.sender==msg.clientname){
+    div.style.backgroundColor="black";
+    div.style.color="white";
+    chat.sender="You";
+    }
+    div.innerHTML=`<br><p class='meta'>${chat.sender}&nbsp<span>${chat.time}<span></p><p class='test'>${chat.msg}</p>`;
+    document.querySelector('.chat-messages').append(div);
+})
+})
+
 //receiving from server...
+sock.on('personalmessage',(msg)=>{
+    console.log(msg);
+    output1(msg);
+    
+    chat.scrollTop=chat.scrollHeight;
+})
 sock.on('message',(msg)=>{
     console.log(msg);
     output(msg);
     
     chat.scrollTop=chat.scrollHeight;
 })
+function output1(msg){
+    var div=document.createElement('div');
+    div.classList.add('message');
+    if(sock.id==msg.id){
+    div.style.backgroundColor="black";
+    div.style.color="white";
+    if(msg.uName!="ChatBot")
+    msg.uName="You";
+    }
+    div.style.background="#7386ff";
+    div.style.color="white";
+    div.innerHTML=`<br><p class='meta' style="color:white">${msg.uName}&nbsp<span style="color:white">${msg.time}</span></p><p class='test'>${msg.txt}</p>`;
+    document.querySelector('.chat-messages').append(div);
+}
 
 function output(msg){
     var div=document.createElement('div');
     div.classList.add('message');
+    if(sock.id==msg.id){
+    div.style.backgroundColor="black";
+    div.style.color="white";
+    if(msg.uName!="ChatBot")
+    msg.uName="You";
+    }
     div.innerHTML=`<br><p class='meta'>${msg.uName}&nbsp<span>${msg.time}<span></p><p class='test'>${msg.txt}</p>`;
     document.querySelector('.chat-messages').append(div);
 }
 
-var source=new EventSource("../views/signup.html");
-source.onmessage=function(event){
-    console.log(event.data);
-    document.getElementById("result").innerHTML+=event.data+"<br>";
-}
+// var source=new EventSource("../views/signup.html");
+// source.onmessage=function(event){
+//     console.log(event.data);
+//     document.getElementById("result").innerHTML+=event.data+"<br>";
+// }
