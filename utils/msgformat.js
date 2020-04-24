@@ -1,11 +1,12 @@
 const moment=require("moment");
+const d=new Date();
 
 function chatMsgformat(id,uName,txt){
     return {
         id,
         uName,
         txt,
-        time: moment().format('h:m a')
+        time: d.getHours()+":"+d.getMinutes(),
     };
 };
 

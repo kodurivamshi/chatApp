@@ -5,8 +5,11 @@ var form=document.getElementById('chat-form');
 var roomname=document.getElementById('room-name');
 var roomusers=document.getElementById('users');
 
+//var personalchatin=[];
+//var personalchatout=[];
 var chat=[];
 var personalchat;
+
 
 form.addEventListener('submit',(event)=>{
     event.preventDefault();
@@ -22,13 +25,13 @@ form.addEventListener('submit',(event)=>{
             to:txt1,
             message:txt
         }
-        sock.emit('personalmsg',msg);//personal msg within the group...
+        sock.emit('personalmsg',msg);
         event.target.elements.to.value='';
     }
 }) 
 
 //get the current client username and room...
-const {username, room}=Qs.parse(location.search,{
+const {username,room}=Qs.parse(location.search,{
     ignoreQueryPrefix: true
 });
 //sending username and room to the server to establish the socket connection to particular room..
@@ -59,7 +62,7 @@ sock.on('roomusers',({room, users})=>{
                 personalchat=msg
                 if(personalchat.length>0){
                     personalchat.forEach(user=>{
-                        console.log(user);
+     //                   console.log(user);
                         if(user.sender!="You "){
                             var div=pop.document.createElement("div");
                             var para=pop.document.createElement("p");
@@ -165,75 +168,76 @@ sock.on('roomusers',({room, users})=>{
             //     return (parseInt(timeStr2.replace(':', ''), 10) > parseInt(timeStr1.replace(':', ''), 10)) ? -1 : 1;  
             //    });
             //    console.log("sorted chat:-",chat);
-               var flag=0;
-               if(chat.length>0){
-                    chat.forEach(user=>{
-                        if(users==user.uName){
-                        if(user.dir=="not me"){
-                            var div=pop.document.createElement("div");
-                            var para=pop.document.createElement("p");
-                            para.innerHTML=`${user.uName}&nbsp${user.time}<br>${user.txt}<br>`;
-                            div.style.backgroundColor="#667aff"
-                            div.style.color=" #e6e9ff"
-                            div.style.borderRadius="10px"
-                            div.style.textAlign="left";
-                            div.append(para);
-                            main.append(div);
-                            //pop.document.body.appendChild(main);
-            
-                        }else{
-                            var div=pop.document.createElement("div");
-                            var para=pop.document.createElement("p");
-                            para.innerHTML=`You ${user.time}&nbsp<br>${user.txt}<br>`;
-                            div.style.border="2px sollid white";
-                            div.style.backgroundColor="black";
-                            div.style.color="white";
-                            div.style.borderRadius="10px"
-                            div.style.textAlign="right";
-                            div.append(para);
-                            main.append(div);
-                            //pop.document.body.appendChild(main);
-                        }
-                    }
-                    })
-                }
-                else{
-                    flag=1;
-                    // var text=pop.document.createElement("input");
-                    // text.setAttribute("type","text");
-                    // text.setAttribute("class","txt");
-                    // foot.append(text);
-                   // pop.document.body.appendChild(foot);
+             //  var flag=0;
+               //if(chat.length>0){
+                //    main.innerHTML='';
+                // chat.forEach(user=>{
+                //     //                   console.log(user);
+                //                        if(user.sender!="You "){
+                //                            var div=pop.document.createElement("div");
+                //                            var para=pop.document.createElement("p");
+                //                            para.innerHTML=`${user.sender}&nbsp${user.time}<br>${user.msg}<br>`;
+                //                            div.style.backgroundColor="#667aff"
+                //                            div.style.color=" #e6e9ff"
+                //                            div.style.borderRadius="10px"
+                //                            div.style.textAlign="left";
+                //                            div.append(para);
+                //                            main.append(div);
+                //                            //pop.document.body.appendChild(main);
+                           
+                //                        }else{
+                //                            var div=pop.document.createElement("div");
+                //                            var para=pop.document.createElement("p");
+                //                            para.innerHTML=`You ${user.time}&nbsp<br>${user.msg}<br>`;
+                //                            div.style.border="2px sollid white";
+                //                            div.style.backgroundColor="black";
+                //                            div.style.color="white";
+                //                            div.style.borderRadius="10px"
+                //                            div.style.textAlign="right";
+                //                            div.append(para);
+                //                            main.append(div);
+                //                            //pop.document.body.appendChild(main);
+                //                        }
+                // //                    })
+                // }
+                // else{
+                //     flag=1;
+                //     // var text=pop.document.createElement("input");
+                //     // text.setAttribute("type","text");
+                //     // text.setAttribute("class","txt");
+                //     // foot.append(text);
+                //    // pop.document.body.appendChild(foot);
         
-                    // var but=pop.document.createElement("button");
-                    // but.innerHTML="send";
-                    but.addEventListener('click',(event)=>{
-                        var txt=pop.document.querySelector(".txt").value;
-                        const msg={
-                            to:users,
-                            from:sock.id,
-                            message:txt
-                        }
+                //     // var but=pop.document.createElement("button");
+                //     // but.innerHTML="send";
+                //     but.addEventListener('click',(event)=>{
+                //         var txt=pop.document.querySelector(".txt").value;
+                //         const msg={
+                //             to:users,
+                //             from:sock.id,
+                //             message:txt
+                //         }
                         
-                        var div=pop.document.createElement("div");
-                        var para=pop.document.createElement("p");
-                        para.innerHTML=`<h4>"You&nbsp"<h4><br>${msg.message}<br>`;
-                        div.style.border="2px sollid white";
-                        div.style.backgroundColor="black";
-                        div.style.color="white";
-                        div.style.borderRadius="10px"
-                        div.style.textAlign="right";
-                        div.append(para);
-                        main.append(div);
-                     //   pop.document.body.appendChild(main);
-        
-                        sock.emit("panelmsg",msg);
+                //         var div=pop.document.createElement("div");
+                //         var para=pop.document.createElement("p");
+                //         const d=new Date();
+                //         para.innerHTML=`<h4>You&nbsp${d.getHours()+":"+d.getMinutes()}<h4><br\>${msg.message}<br>`;
+                //         div.style.border="2px sollid white";
+                //         div.style.backgroundColor="black";
+                //         div.style.color="white";
+                //         div.style.borderRadius="10px"
+                //         div.style.textAlign="right";
+                //         div.append(para);
+                //         main.append(div);
+                //      //   pop.document.body.appendChild(main);
+                //         chat.pop();
+                //         sock.emit("panelmsg",msg);
                        
-                    })
-                    foot.append(but);
-                    //pop.document.body.appendChild(foot);
-                }
-                if(flag==0){
+                //     })
+                //     foot.append(but);
+                //     //pop.document.body.appendChild(foot);
+                // }
+                // if(flag==0){
                 // var text=pop.document.createElement("input");
                 // text.setAttribute("type","text");
                 // text.setAttribute("class","txt");
@@ -251,50 +255,85 @@ sock.on('roomusers',({room, users})=>{
                         from:sock.id,
                         message:txt
                     }
-                    console.log(msg);
+   //                 console.log(msg);
+                    
+                //    pop.document.body.appendChild(main);
+                
+                    sock.emit("panelmsg",msg);
+                    
+                    
                     var div=pop.document.createElement("div");
                     var para=pop.document.createElement("p");
-                    para.innerHTML=`<h4>"You&nbsp"<h4><br>${msg.message}<br>`;
+                    const d=new Date();
+                    para.innerHTML=`<h4>You&nbsp${d.getHours()+":"+d.getMinutes()}<h4>${msg.message}<br>`;
                     div.style.border="2px sollid white";
                     div.style.backgroundColor="black";
                     div.style.color="white";
                     div.style.textAlign="right";
                     div.append(para);
                     main.append(div);
-                //    pop.document.body.appendChild(main);
-                    sock.emit("panelmsg",msg);
                    
                 })
+                sock.emit("personalchat",{to:users,from:sock.id});
+                sock.on('personalchat',(msg)=>{
+                    if(msg.length>0){
+                        main.innerHTML='';
+                        console.log(msg);
+                    msg.forEach(user=>{
+                        //                   console.log(user);
+                                           if(user.sender!="You "){
+                                               var div=pop.document.createElement("div");
+                                               var para=pop.document.createElement("p");
+                                               para.innerHTML=`${user.sender}&nbsp${user.time}<br>${user.msg}<br>`;
+                                               div.style.backgroundColor="#667aff"
+                                               div.style.color=" #e6e9ff"
+                                               div.style.borderRadius="10px"
+                                               div.style.textAlign="left";
+                                               div.append(para);
+                                               main.append(div);
+                                               //pop.document.body.appendChild(main);
+                               
+                                           }else{
+                                               var div=pop.document.createElement("div");
+                                               var para=pop.document.createElement("p");
+                                               para.innerHTML=`You ${user.time}&nbsp<br>${user.msg}<br>`;
+                                               div.style.border="2px sollid white";
+                                               div.style.backgroundColor="black";
+                                               div.style.color="white";
+                                               div.style.borderRadius="10px"
+                                               div.style.textAlign="right";
+                                               div.append(para);
+                                               main.append(div);
+                                               //pop.document.body.appendChild(main);
+                                           }
+                                       })
+                }})
+                
+                //chat.pop();
                 // foot.append(but);
                 //pop.document.body.appendChild(foot);
-            }
-            
             });
+            
+            //});
         var li=document.createElement("li");
         li.appendChild(anc);
         roomusers.appendChild(li);
      } })
-
 });
 
-sock.on('panelpersonalmsgin',(msg)=>{
-    //personalchatin.push(msg);
-    //console.log(msg);
-    msg.dir="not me";
-    chat.push(msg);
-})
 
-sock.on('panelpersonalmsgout',(msg)=>{
-    //personalchatout.push(msg);
-    //console.log(msg);
-    msg.dir="me";
-    chat.push(msg);
-})
+
+// sock.on('panelpersonalmsgout',(msg)=>{
+//     //personalchatout.push(msg);
+//     //console.log(msg);
+//     msg.dir="me";
+//     chat.push(msg);
+// })
 
 //roommessages printing from database...
 sock.on('room',(msg)=>{
     
-    console.log(msg.chat,msg.clientname);
+    //console.log(msg.chat,msg.clientname);
     msg.chat.forEach(chat=>{
     var div=document.createElement('div');
     div.classList.add('message');
@@ -309,32 +348,11 @@ sock.on('room',(msg)=>{
 })
 
 //receiving from server...
-sock.on('personalmessage',(msg)=>{
-    console.log(msg);
-    output1(msg);
-    
-    chat.scrollTop=chat.scrollHeight;
-})
 sock.on('message',(msg)=>{
-    console.log(msg);
     output(msg);
-    
-    chat.scrollTop=chat.scrollHeight;
+    //console.log(msg.time);
+    chat.scrollWidth=chat.scrollHeight;
 })
-function output1(msg){
-    var div=document.createElement('div');
-    div.classList.add('message');
-    if(sock.id==msg.id){
-    div.style.backgroundColor="black";
-    div.style.color="white";
-    if(msg.uName!="ChatBot")
-    msg.uName="You";
-    }
-    div.style.background="#7386ff";
-    div.style.color="white";
-    div.innerHTML=`<br><p class='meta' style="color:white">${msg.uName}&nbsp<span style="color:white">${msg.time}</span></p><p class='test'>${msg.txt}</p>`;
-    document.querySelector('.chat-messages').append(div);
-}
 
 function output(msg){
     var div=document.createElement('div');
@@ -349,8 +367,30 @@ function output(msg){
     document.querySelector('.chat-messages').append(div);
 }
 
+sock.on('personalmsg',(msg)=>{
+    output1(msg);
+    //console.log(msg.time);
+    chat.scrollWidth=chat.scrollHeight;
+})
+function output1(msg){
+    var div=document.createElement('div');
+    div.classList.add('message');
+    div.style.background="#7386ff"
+    div.style.color="white";
+    div.innerHTML=`<br><p class='meta' style="color:white">${msg.uName}&nbsp<span style="color:white">${msg.time}<span></p><p class='test'>${msg.txt}</p>`;
+    document.querySelector('.chat-messages').append(div);
+}
+
 // var source=new EventSource("../views/signup.html");
 // source.onmessage=function(event){
-//     console.log(event.data);
+//     console.log(event.data,"ssss");
 //     document.getElementById("result").innerHTML+=event.data+"<br>";
 // }
+
+
+  
+function compare(a, b) {  
+    var dateA = new Date(a.date).getTime(); 
+    var dateB = new Date(b.date).getTime(); 
+    return dateA > dateB ? 1 : -1;  
+}; 
