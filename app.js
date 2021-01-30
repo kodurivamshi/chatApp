@@ -1,4 +1,5 @@
-
+const fs=require("fs");
+const axios=require("axios");
 const express = require('express');
 const http=require("http");
 const path=require("path");
@@ -16,7 +17,7 @@ const {joinuser, getuser, leaveuser, roomusers, getid}=require('./utils/users');
 const roomschema=require("./models/room");
 const roomchat=require("./models/roomchat");
 const clientchat=require("./models/chat");
-
+const download=require("image-downloader");
 require("dotenv").config();
 
 const app = express();
@@ -95,7 +96,49 @@ var io=socket.listen(server);
 io.on('connection',(clientsocket)=>{
     console.log("successfully WS connected..");
 
-    clientsocket.on("joinroom",({username,room})=>{
+clientsocket.on("image",(image)=>{
+    console.log(image);
+    const user=getuser(clientsocket.id);
+    io.to(user.room).emit('room_images',{room: user.room,users:roomusers(user.room),image:image});
+    //clientsocket.broadcast.to(user.room).emit("room_images",{image});
+       
+})
+clientsocket.on("image_download",(image)=>{
+    console.log("download:",image);
+    // async function download(){
+    //     const p=path.resolve(__dirname,'files',image.name);
+    //     const response=await axios({
+    //         host:'localhost',
+    //         port:3000,
+    //         method:'GET',
+    //         url:image.img,
+    //         responseType:'stream'
+    //     })
+    //     response.data.pipe(fs.createWriteStream(p));
+    //     return new Promise((resolve,reject)=>{
+    //         response.data.on('end',()=>{
+    //             resolve()
+    //         })
+    //         response.data.on('error',err=>{
+    //             reject(err)
+    //         })
+    //     }).then(()=>console.log("ss")).catch((err)=>console.log(err));
+    // }
+    // download().then(()=>{
+    //     console.log('downloaded');
+    // })
+
+    // const options={
+    //     url:'http://localhost:3000/'+image.img,
+    //     dest:'/files'
+    // }
+    // download.image(options).then(({filename})=>{
+    //     console.log(filename);
+    // })
+    // .catch(err=>console.log(err));
+})  
+
+clientsocket.on("joinroom",({username,room})=>{
         client=username;
         //console.log(username,room);
         const user=joinuser(clientsocket.id,username,room);

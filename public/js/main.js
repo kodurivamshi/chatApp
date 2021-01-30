@@ -10,12 +10,22 @@ var roomusers=document.getElementById('users');
 var chat=[];
 var personalchat;
 
+document.getElementById('img').addEventListener('change',(e)=>{
+    var file=e.target.files[0];
+    console.log(file.name);
+    var reader=new FileReader();
+    reader.onload=function(evt){
+        sock.emit('image',{img:evt.target.result,name:file.name});
+    };
+    reader.readAsDataURL(file);
 
+})
 form.addEventListener('submit',(event)=>{
     event.preventDefault();
     var txt1=event.target.elements.to.value;
     var txt=event.target.elements.msg.value;
     if(txt1==''){
+        
     sock.emit('chatmessage',txt);//sending to server...from one particular client..
     event.target.elements.msg.value='';
     event.target.elements.msg.focus();
@@ -353,7 +363,32 @@ sock.on('message',(msg)=>{
     //console.log(msg.time);
     chat.scrollWidth=chat.scrollHeight;
 })
-
+sock.on('room_images',({image})=>{
+    console.log("client",image);
+    // var div=document.getElementById("image");
+    // div.innerHTML=`<img src="${image}">`;
+    // div.innerHTML=`<img src="${image}">`;
+    var div=document.createElement("div");
+    div.innerHTML=`<img src="${image.img}" height="100" width="100">&nbsp&nbsp&nbsp${image.name}`
+    div.addEventListener('click',()=>{
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+        document.querySelector('.modal-body').innerHTML=`<img src="${image.img}" height="500" width="500">`;
+        modal.style.display = "block";
+        span.onclick = function() {
+            modal.style.display = "none";
+          }
+          window.onclick = function(event) {
+            if (event.target == modal) {
+              modal.style.display = "none";
+            }
+          }
+         
+              sock.emit('image_download',image);
+         
+    })
+    document.querySelector('.chat-messages').append(div);
+})
 function output(msg){
     var div=document.createElement('div');
     div.classList.add('message');
